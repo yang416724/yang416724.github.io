@@ -8,63 +8,104 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
 body{background:#fff7fc;padding:20px;color:#333}
 .title{text-align:center;font-size:26px;color:#ff88b5;margin:20px 0}
+.section{margin:30px 0}
+.sec-title{font-size:20px;color:#ff70a9;margin:15px 0;text-align:center}
 .time-box{background:#fff;border-radius:20px;padding:30px;text-align:center;box-shadow:0 6px 20px #ffe6f0}
-
-/* 自定义时长输入 */
-.input-group{margin:12px 0;display:flex;gap:10px;justify-content:center;align-items:center}
+.input-group{margin:12px 0;display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap}
+#taskName{width:120px;padding:8px 12px;border:1px solid #ffc9e0;border-radius:16px;text-align:center;font-size:16px}
 #customMinutes{width:80px;padding:8px 12px;border:1px solid #ffc9e0;border-radius:16px;text-align:center;font-size:16px}
 .set-btn{padding:8px 14px;border:none;border-radius:16px;background:#ff99c8;color:#fff}
-
 #time{font-size:48px;font-weight:bold;color:#ff70a9;margin:20px 0}
-/* 累计时长显示 */
 .total-text{font-size:14px;color:#ff70a9;margin:8px 0}
-
-.btns{display:flex;gap:12px;justify-content:center;margin:20px 0}
+.btns{display:flex;gap:12px;justify-content:center;margin:20px 0;flex-wrap:wrap}
 .btn{padding:12px 24px;border:none;border-radius:30px;background:#ff99c8;color:#fff;font-size:16px}
 .btn:disabled{background:#ddd}
 .pause-text{color:#ff70a9;height:24px}
+.record-list{max-height:80px;overflow-y:auto;margin:10px 0;font-size:14px;color:#666}
 .tabs{display:flex;gap:8px;overflow:auto;margin:30px 0;padding:10px 0}
 .tab{padding:10px 16px;background:#fff;border-radius:20px;white-space:nowrap;box-shadow:0 2px 10px #ffe6f0}
 .tab.active{background:#ff99c8;color:#fff}
 .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
 .item{aspect-ratio:1;background:#fff;border-radius:12px;display:grid;place-items:center;font-size:24px;box-shadow:0 2px 10px #ffe6f0}
+.week-wrap{background:#fff;border-radius:20px;padding:20px;box-shadow:0 6px 20px #ffe6f0}
+.week-color-tabs{display:flex;gap:6px;justify-content:center;margin:10px 0;flex-wrap:wrap}
+.color-tab{width:24px;height:24px;border-radius:50%;cursor:pointer}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:15px}
+.week-day{text-align:center;font-size:12px;color:#666}
+.week-cell{height:80px;border-radius:12px;background:#fafafa;padding:4px;position:relative;overflow:hidden}
+.week-progress{position:absolute;bottom:0;left:0;right:0;width:100%}
+.week-p1{height:33%;background:var(--c1)}
+.week-p2{height:33%;background:var(--c2)}
+.week-p3{height:34%;background:var(--c3)}
+.week-text{position:relative;z-index:1;font-size:11px;line-height:1.2;padding:2px;max-height:100%;overflow:hidden}
+.card-btn{font-size:12px;padding:4px 8px;background:#ff99c8;color:#fff;border:none;border-radius:12px;margin:4px}
+.month-wrap{background:#fff;border-radius:20px;padding:20px;box-shadow:0 6px 20px #ffe6f0}
+.month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.month-head{text-align:center;font-size:12px;color:#999}
+.month-cell{aspect-ratio:1;border-radius:8px;background:#fafafa;display:flex;flex-direction:column;align-items:center;justify:center;padding:2px;position:relative}
+.month-emoji{font-size:16px;margin-top:2px;z-index:1}
+.month-date{font-size:10px;z-index:1}
+:root{--c1:#FFC9E0;--c2:#FFC9E0;--c3:#FFC9E0}
 </style>
 </head>
 <body>
-  <h1 class="title">🍰专注收集馆</h1>
-  <div class="time-box">
-    <div>专注累计满1小时 · 解锁可爱贴纸</div>
-
-    <!-- 自定义时长输入 -->
-    <div class="input-group">
-      <span>本次专注：</span>
-      <input type="number" id="customMinutes" min="1" value="20" placeholder="分钟">
-      <button class="set-btn" onclick="setFocusTime()">确定</button>
+<h1 class="title">🍰专注收集馆</h1>
+<div class="section">
+    <div class="time-box">
+        <div>专注累计满1小时 · 解锁可爱贴纸</div>
+        <div class="input-group">
+            <span>专注内容：</span>
+            <input type="text" id="taskName" placeholder="如：画画" value="学习">
+        </div>
+        <div class="input-group">
+            <span>本次专注：</span>
+            <input type="number" id="customMinutes" min="1" value="20" placeholder="分钟">
+            <button class="set-btn" onclick="setFocusTime()">确定</button>
+        </div>
+        <div id="time">00:20:00</div>
+        <div class="total-text" id="totalTip">累计专注：0 分钟</div>
+        <div class="pause-text" id="pauseTip"></div>
+        <div class="record-list" id="recordList"></div>
+        <div class="btns">
+            <button class="btn" id="start">开始专注</button>
+            <button class="btn" id="pause">暂停</button>
+            <button class="btn" id="reset">重置</button>
+        </div>
+        <div>补签卡：<span id="cardNum">0</span>/6 张</div>
     </div>
-
-    <div id="time">00:20:00</div>
-    <!-- 累计时长 -->
-    <div class="total-text" id="totalTip">累计专注：0 分钟</div>
-    <div class="pause-text" id="pauseTip"></div>
-
-    <div class="btns">
-      <button class="btn" id="start">开始专注</button>
-      <button class="btn" id="pause">暂停</button>
-      <button class="btn" id="reset">重置</button>
-    </div>
-  </div>
-
-  <div class="tabs">
+</div>
+<div class="tabs">
     <div class="tab active" data-id="0">粉色</div>
     <div class="tab" data-id="1">紫色</div>
     <div class="tab" data-id="2">爱心</div>
     <div class="tab" data-id="3">动物</div>
     <div class="tab" data-id="4">美食</div>
-  </div>
-  <div class="grid" id="box"></div>
-
+</div>
+<div class="grid" id="box"></div>
+<div class="section">
+    <h2 class="sec-title">📅 周专注进度</h2>
+    <div class="week-wrap">
+        <div class="week-color-tabs">
+            <div class="color-tab" style="background:#FFC9E0" onclick="setWeekColor(0)"></div>
+            <div class="color-tab" style="background:#E2C6F1" onclick="setWeekColor(1)"></div>
+            <div class="color-tab" style="background:#C6F0F7" onclick="setWeekColor(2)"></div>
+            <div class="color-tab" style="background:#FFF0B9" onclick="setWeekColor(3)"></div>
+            <div class="color-tab" style="background:#D1F7D1" onclick="setWeekColor(4)"></div>
+            <div class="color-tab" style="background:#FFD9B9" onclick="setWeekColor(5)"></div>
+            <div class="color-tab" style="background:#B9F7F0" onclick="setWeekColor(6)"></div>
+        </div>
+        <div class="week-grid" id="weekGrid"></div>
+        <button class="card-btn" onclick="useCard()">使用补签卡</button>
+    </div>
+</div>
+<div class="section">
+    <h2 class="sec-title">🗓️ 月专注日历</h2>
+    <div class="month-wrap">
+        <div class="month-grid" id="monthGrid"></div>
+    </div>
+</div>
 <script>
-const books=[
+const books = [
   ['🌸','🌷','🎀','🍓','🍑','🧸','🍧','🍭','🍬','🩰','🎡','🛍️','🌺','🍥','🎟️','💒','🩷','🎠'],
   ['🔮','🍇','🪻','💜','🌂','🎆','🧩','🪁','🌌','🍆','🟣','💟','☂️','🔮','🟪','🎸','🪀','🌃'],
   ['❤️','🧡','💛','💚','💙','💜','🩷','🩵','💕','💞','💓','💗','💖','💘','💝','💟','❣️','🩶'],
@@ -72,157 +113,181 @@ const books=[
   ['🍰','🍮','🍪','🍩','🍫','🍧','🍨','🍒','🥐','🥞','🍕','🍔','🍟','🍙','🍚','🍜','🍡','🥧']
 ];
 const itemCount = 18;
-const TOTAL_NEED = 3600; // 解锁需要：1小时=3600秒
-
-// 本地存储
-let unlocked = JSON.parse(localStorage.getItem("unlocked")) || [];
-let totalFocusSeconds = JSON.parse(localStorage.getItem("totalFocusSeconds")) || 0; // 累计专注秒数
-
-let current = 0;
-let focusTime = 20 * 60; // 默认20分钟
+const TOTAL_NEED = 3600;
+const COLORS = ["#FFC9E0","#E2C6F1","#C6F0F7","#FFF0B9","#D1F7D1","#FFD9B9","#B9F7F0"];
+const now = new Date();
+const TODAY = now.getDate();
+const WEEK_DAY = ["一","二","三","四","五","六","日"];
+let store = {
+  unlocked: JSON.parse(localStorage.getItem("unlocked")) || [],
+  totalFocusSeconds: JSON.parse(localStorage.getItem("totalFocusSeconds")) || 0,
+  records: JSON.parse(localStorage.getItem("records")) || [],
+  cards: parseInt(localStorage.getItem("cards")) || 0,
+  weekColor: parseInt(localStorage.getItem("weekColor")) || 0,
+  monthEmoji: JSON.parse(localStorage.getItem("monthEmoji")) || {},
+  dayProgress: JSON.parse(localStorage.getItem("dayProgress")) || {}
+};
+let focusTime = 20 * 60;
 let pauseTime = 900;
 let t1 = null, t2 = null;
 let isPause = false;
-
 const $ = s => document.getElementById(s);
-const timeEl = $("time");
-const tipEl = $("pauseTip");
-const boxEl = $("box");
-const totalTipEl = $("totalTip");
-
-// 格式化时间
 function fmt(t){
   let h = Math.floor(t / 3600);
   let m = Math.floor((t % 3600) / 60);
   let s = t % 60;
   return `${h.toString().padStart(2,0)}:${m.toString().padStart(2,0)}:${s.toString().padStart(2,0)}`;
 }
-
-// 显示本次倒计时
-function showTime(){ timeEl.innerText = fmt(focusTime); }
-
-// 显示累计时长
+function getDateKey(d = new Date()){
+  return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+}
+function save(){
+  localStorage.setItem("unlocked", JSON.stringify(store.unlocked));
+  localStorage.setItem("totalFocusSeconds", JSON.stringify(store.totalFocusSeconds));
+  localStorage.setItem("records", JSON.stringify(store.records));
+  localStorage.setItem("cards", store.cards);
+  localStorage.setItem("weekColor", store.weekColor);
+  localStorage.setItem("monthEmoji", JSON.stringify(store.monthEmoji));
+  localStorage.setItem("dayProgress", JSON.stringify(store.dayProgress));
+}
+function showTime(){ $("time").innerText = fmt(focusTime); }
 function showTotal(){
-  let min = (totalFocusSeconds / 60).toFixed(1);
-  totalTipEl.innerText = `累计专注：${min} 分钟 / 目标60分钟`;
+  let min = (store.totalFocusSeconds / 60).toFixed(1);
+  $("totalTip").innerText = `累计专注：${min} 分钟 / 目标60分钟`;
 }
-
-// 暂停倒计时提示
 function showPause(){
-  tipEl.innerText = pauseTime > 0 ? `暂停剩余 ${Math.floor(pauseTime/60)}:${(pauseTime%60).toString().padStart(2,0)}` : "";
+  $("pauseTip").innerText = pauseTime > 0 ? `暂停剩余 ${Math.floor(pauseTime/60)}:${(pauseTime%60).toString().padStart(2,0)}` : "";
 }
-
-// 渲染图鉴
-function render(){
-  boxEl.innerHTML = "";
-  let list = books[current];
-  for(let i=0; i<itemCount; i++){
-    let div = document.createElement("div");
-    div.className = "item";
-    div.innerText = unlocked.includes(current*100+i) ? list[i] : "?";
-    boxEl.appendChild(div);
-  }
+function showRecord(){
+  let list = store.records.slice(-5);
+  $("recordList").innerHTML = list.map(i=>`${i.task}｜${i.min}分钟`).join("<br>");
 }
-
-// 切换图鉴标签
-document.querySelectorAll(".tab").forEach(tab => {
-  tab.onclick = () => {
-    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-    tab.classList.add("active");
-    current = +tab.dataset.id;
-    render();
-  }
-});
-
-// 解锁奖励
-function getReward(){
-  let all = [], ok = [];
-  books.forEach((b,i) => {
-    for(let j=0; j<itemCount; j++) all.push(i*100+j);
-  });
-  ok = all.filter(x => !unlocked.includes(x));
-  if(!ok.length) return alert("🎉全部收集完毕！");
-  let r = ok[Math.floor(Math.random() * ok.length)];
-  unlocked.push(r);
-  localStorage.setItem("unlocked", JSON.stringify(unlocked));
-  render();
-}
-
-// 检查是否满1小时
-function checkTotal(){
-  if(totalFocusSeconds >= TOTAL_NEED){
-    totalFocusSeconds = 0; // 清零重新累计
-    localStorage.setItem("totalFocusSeconds", totalFocusSeconds);
-    getReward();
-    alert("✅ 累计满1小时！成功解锁一个贴纸～");
-  }
-}
-
-// 设置专注时长
+function showCard(){ $("cardNum").innerText = store.cards; }
 function setFocusTime(){
   let val = parseInt($("customMinutes").value) || 20;
-  if(val < 1) val = 1;
-  focusTime = val * 60;
+  focusTime = Math.max(1, val) * 60;
   showTime();
 }
-
-// 开始
 $("start").onclick = () => {
   if(t1) return;
-  $("start").disabled = true;
-  $("pause").disabled = false;
-
+  $("start").disabled = true; $("pause").disabled = false;
   t1 = setInterval(() => {
     focusTime--;
-    totalFocusSeconds++; // 累计+1秒
-    localStorage.setItem("totalFocusSeconds", totalFocusSeconds);
-
-    showTime();
-    showTotal();
-
+    store.totalFocusSeconds++;
+    showTime(); showTotal();
     if(focusTime <= 0){
       clearInterval(t1); t1 = null;
-      checkTotal(); // 检查是否解锁
-      $("start").disabled = false;
-      $("pause").disabled = true;
+      let task = $("taskName").value || "学习";
+      let min = parseInt($("customMinutes").value) || 20;
+      store.records.push({date:getDateKey(),task,min});
+      let key = getDateKey();
+      store.dayProgress[key] = Math.max(store.dayProgress[key]||0, min);
+      if(min >= 120 && store.cards <6){
+        store.cards = Math.min(6, store.cards+1);
+      }
+      save();
+      checkTotal();
+      renderWeek(); renderMonth(); showRecord(); showCard();
+      $("start").disabled = false; $("pause").disabled = true;
     }
   }, 1000);
 };
-
-// 暂停
 $("pause").onclick = () => {
   if(isPause || !t1) return;
-  isPause = true;
-  clearInterval(t1); t1 = null;
+  isPause = true; clearInterval(t1); t1 = null;
   $("pause").disabled = true;
-
   t2 = setInterval(() => {
-    pauseTime--;
-    showPause();
+    pauseTime--; showPause();
     if(pauseTime <= 0){
-      clearInterval(t2); t2 = null;
-      isPause = false;
-      $("pause").disabled = false;
-      $("start").click();
+      clearInterval(t2); t2 = null; isPause = false;
+      $("pause").disabled = false; $("start").click();
     }
   }, 1000);
 };
-
-// 重置
 $("reset").onclick = () => {
   clearInterval(t1); clearInterval(t2);
   t1 = t2 = null; isPause = false;
-  setFocusTime();
-  pauseTime = 900;
+  setFocusTime(); pauseTime = 900;
   showTime(); showPause(); showTotal();
-  $("start").disabled = false;
-  $("pause").disabled = true;
+  $("start").disabled = false; $("pause").disabled = true;
 };
-
-// 初始化
-showTime();
-showTotal();
-render();
-</script>
-</body>
-</html>
+function getReward(){
+  let all = [], ok = [];
+  books.forEach((b,i)=>{for(let j=0;j<itemCount;j++)all.push(i*100+j)});
+  ok = all.filter(x=>!store.unlocked.includes(x));
+  if(!ok.length)return alert("🎉全部收集完毕！");
+  store.unlocked.push(ok[Math.floor(Math.random()*ok.length)]);
+  save(); render();
+}
+function checkTotal(){
+  if(store.totalFocusSeconds >= TOTAL_NEED){
+    store.totalFocusSeconds = 0; save();
+    getReward(); alert("✅ 累计满1小时！成功解锁一个贴纸～");
+  }
+}
+function render(){
+  $("box").innerHTML = "";
+  let list = books[document.querySelector(".tab.active").dataset.id];
+  for(let i=0;i<itemCount;i++){
+    let d = document.createElement("div");
+    d.className = "item";
+    d.innerText = store.unlocked.includes(current*100+i) ? list[i] : "?";
+    $("box").appendChild(d);
+  }
+}
+document.querySelectorAll(".tab").forEach(tab=>{
+  tab.onclick = () => {
+    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+    tab.classList.add("active"); render();
+  }
+});
+function setWeekColor(idx){
+  store.weekColor = idx; save();
+  let c = COLORS[idx];
+  document.documentElement.style.setProperty("--c1",c);
+  document.documentElement.style.setProperty("--c2",c);
+  document.documentElement.style.setProperty("--c3",c);
+}
+function renderWeek(){
+  let g = $("weekGrid"); g.innerHTML = "";
+  WEEK_DAY.forEach(w=>{
+    let d = document.createElement("div");
+    d.className = "week-day"; d.innerText = w;
+    g.appendChild(d);
+  });
+  for(let i=0;i<7;i++){
+    let c = document.createElement("div");
+    c.className = "week-cell";
+    let p = document.createElement("div");
+    p.className = "week-progress";
+    p.innerHTML = `<div class="week-p1"></div><div class="week-p2"></div><div class="week-p3"></div>`;
+    let t = document.createElement("div");
+    t.className = "week-text";
+    t.innerText = "无记录";
+    c.appendChild(p); c.appendChild(t);
+    g.appendChild(c);
+  }
+  setWeekColor(store.weekColor);
+}
+function useCard(){
+  if(store.cards <1) return alert("暂无补签卡");
+  store.cards--; save(); showCard();
+  alert("补签成功！本日进度已填满");
+  store.dayProgress[getDateKey()] = 60;
+  renderWeek(); renderMonth();
+}
+function renderMonth(){
+  let g = $("monthGrid"); g.innerHTML = "";
+  ["一","二","三","四","五","六","日"].forEach(n=>{
+    let d = document.createElement("div");
+    d.className = "month-head"; d.innerText = n; g.appendChild(d);
+  });
+  let days = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  for(let i=1;i<=days;i++){
+    let c = document.createElement("div");
+    c.className = "month-cell";
+    let dt = document.createElement("div");
+    dt.className = "month-date"; dt.innerText = i;
+    let em = document.createElement("div");
+    em.className = "month-emoji";
+    let k = `${now.getFullYear()}-${now.getMonth()+1}-${
