@@ -50,6 +50,7 @@ body{background:#fff7fc;padding:20px;color:#333}
 </head>
 <body>
 <h1 class="title">🍰专注收集馆</h1>
+
 <div class="section">
     <div class="time-box">
         <div>专注累计满1小时 · 解锁可爱贴纸</div>
@@ -74,6 +75,7 @@ body{background:#fff7fc;padding:20px;color:#333}
         <div>补签卡：<span id="cardNum">0</span>/6 张</div>
     </div>
 </div>
+
 <div class="tabs">
     <div class="tab active" data-id="0">粉色</div>
     <div class="tab" data-id="1">紫色</div>
@@ -118,6 +120,7 @@ const COLORS = ["#FFC9E0","#E2C6F1","#C6F0F7","#FFF0B9","#D1F7D1","#FFD9B9","#B9
 const now = new Date();
 const TODAY = now.getDate();
 const WEEK_DAY = ["一","二","三","四","五","六","日"];
+
 let store = {
   unlocked: JSON.parse(localStorage.getItem("unlocked")) || [],
   totalFocusSeconds: JSON.parse(localStorage.getItem("totalFocusSeconds")) || 0,
@@ -127,11 +130,13 @@ let store = {
   monthEmoji: JSON.parse(localStorage.getItem("monthEmoji")) || {},
   dayProgress: JSON.parse(localStorage.getItem("dayProgress")) || {}
 };
+
 let focusTime = 20 * 60;
 let pauseTime = 900;
 let t1 = null, t2 = null;
 let isPause = false;
 const $ = s => document.getElementById(s);
+
 function fmt(t){
   let h = Math.floor(t / 3600);
   let m = Math.floor((t % 3600) / 60);
@@ -150,6 +155,7 @@ function save(){
   localStorage.setItem("monthEmoji", JSON.stringify(store.monthEmoji));
   localStorage.setItem("dayProgress", JSON.stringify(store.dayProgress));
 }
+
 function showTime(){ $("time").innerText = fmt(focusTime); }
 function showTotal(){
   let min = (store.totalFocusSeconds / 60).toFixed(1);
@@ -163,11 +169,13 @@ function showRecord(){
   $("recordList").innerHTML = list.map(i=>`${i.task}｜${i.min}分钟`).join("<br>");
 }
 function showCard(){ $("cardNum").innerText = store.cards; }
+
 function setFocusTime(){
   let val = parseInt($("customMinutes").value) || 20;
   focusTime = Math.max(1, val) * 60;
   showTime();
 }
+
 $("start").onclick = () => {
   if(t1) return;
   $("start").disabled = true; $("pause").disabled = false;
@@ -192,6 +200,7 @@ $("start").onclick = () => {
     }
   }, 1000);
 };
+
 $("pause").onclick = () => {
   if(isPause || !t1) return;
   isPause = true; clearInterval(t1); t1 = null;
@@ -204,6 +213,7 @@ $("pause").onclick = () => {
     }
   }, 1000);
 };
+
 $("reset").onclick = () => {
   clearInterval(t1); clearInterval(t2);
   t1 = t2 = null; isPause = false;
@@ -211,6 +221,7 @@ $("reset").onclick = () => {
   showTime(); showPause(); showTotal();
   $("start").disabled = false; $("pause").disabled = true;
 };
+
 function getReward(){
   let all = [], ok = [];
   books.forEach((b,i)=>{for(let j=0;j<itemCount;j++)all.push(i*100+j)});
@@ -225,12 +236,14 @@ function checkTotal(){
     getReward(); alert("✅ 累计满1小时！成功解锁一个贴纸～");
   }
 }
+
 function render(){
   $("box").innerHTML = "";
   let list = books[document.querySelector(".tab.active").dataset.id];
   for(let i=0;i<itemCount;i++){
     let d = document.createElement("div");
     d.className = "item";
+    let current = document.querySelector(".tab.active").dataset.id;
     d.innerText = store.unlocked.includes(current*100+i) ? list[i] : "?";
     $("box").appendChild(d);
   }
@@ -276,6 +289,7 @@ function useCard(){
   store.dayProgress[getDateKey()] = 60;
   renderWeek(); renderMonth();
 }
+
 function renderMonth(){
   let g = $("monthGrid"); g.innerHTML = "";
   ["一","二","三","四","五","六","日"].forEach(n=>{
@@ -290,4 +304,19 @@ function renderMonth(){
     dt.className = "month-date"; dt.innerText = i;
     let em = document.createElement("div");
     em.className = "month-emoji";
-    let k = `${now.getFullYear()}-${now.getMonth()+1}-${
+    let k = `${now.getFullYear()}-${now.getMonth()+1}-${i}`;
+    em.innerText = store.monthEmoji[k] || "😐";
+    em.onclick = ()=>{
+      let e = prompt("输入心情emoji",store.monthEmoji[k]||"😐");
+      if(e){store.monthEmoji[k]=e;save();renderMonth();}
+    };
+    c.appendChild(dt); c.appendChild(em);
+    g.appendChild(c);
+  }
+}
+
+showTime(); showTotal(); showRecord(); showCard();
+render(); renderWeek(); renderMonth();
+</script>
+</body>
+</html>
