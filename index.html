@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>专注计时收集</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+body{background:#fff7fc;padding:20px;color:#333}
+.title{text-align:center;font-size:26px;color:#ff88b5;margin:20px 0}
+.time-box{background:#fff;border-radius:20px;padding:30px;text-align:center;box-shadow:0 6px 20px #ffe6f0}
+#time{font-size:48px;font-weight:bold;color:#ff70a9;margin:20px 0}
+.btns{display:flex;gap:12px;justify-content:center;margin:20px 0}
+.btn{padding:12px 24px;border:none;border-radius:30px;background:#ff99c8;color:#fff;font-size:16px}
+.btn:disabled{background:#ddd}
+.pause-text{color:#ff70a9;height:24px}
+.tabs{display:flex;gap:8px;overflow:auto;margin:30px 0;padding:10px 0}
+.tab{padding:10px 16px;background:#fff;border-radius:20px;white-space:nowrap;box-shadow:0 2px 10px #ffe6f0}
+.tab.active{background:#ff99c8;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.item{aspect-ratio:1;background:#fff;border-radius:12px;display:grid;place-items:center;font-size:24px;box-shadow:0 2px 10px #ffe6f0}
+</style>
+</head>
+<body>
+  <h1 class="title">🍰专注收集馆</h1>
+  <div class="time-box">
+    <div>专注1小时 · 解锁可爱贴纸</div>
+    <div id="time">01:00:00</div>
+    <div class="pause-text" id="pauseTip"></div>
+    <div class="btns">
+      <button class="btn" id="start">开始专注</button>
+      <button class="btn" id="pause">暂停</button>
+      <button class="btn" id="reset">重置</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" data-id="0">粉色</div>
+    <div class="tab" data-id="1">紫色</div>
+    <div class="tab" data-id="2">爱心</div>
+    <div class="tab" data-id="3">动物</div>
+    <div class="tab" data-id="4">美食</div>
+  </div>
+  <div class="grid" id="box"></div>
+<script>
+const books=[
+['🌸','🌷','🎀','🍓','🍑','🧸','🍧','🍭','🍬','🩰','🎡','🛍️','🌺','🍥','🎟️','💒','🩷','🎠'],
+['🔮','🍇','🪻','💜','🌂','🎆','🧩','🪁','🌌','🍆','🟣','💟','☂️','🔮','🟪','🎸','🪀','🌃'],
+['❤️','🧡','💛','💚','💙','💜','🩷','🩵','💕','💞','💓','💗','💖','💘','💝','💟','❣️','🩶'],
+['🐰','🐻','🐼','🐨','🐸','🐷','🐮','🐱','🐶','🐹','🐻‍❄️','🐨','🐯','🦁','🐰','🐱','🐶','🐹'],
+['🍰','🍮','🍪','🍩','🍫','🍧','🍨','🍒','🥐','🥞','🍕','🍔','🍟','🍙','🍚','🍜','🍡','🥧']
+];
+const itemCount=18;
+let unlocked=JSON.parse(localStorage.getItem("unlocked"))||[];
+let current=0;
+let focusTime=3600,pauseTime=900;
+let t1=null,t2=null;
+let isPause=false;
+
+const $=s=>document.getElementById(s);
+const timeEl=$("time"),tipEl=$("pauseTip"),boxEl=$("box");
+
+function fmt(t){
+  let h=Math.floor(t/3600),m=Math.floor((t%3600)/60),s=t%60;
+  return `${h.toString().padStart(2,0)}:${m.toString().padStart(2,0)}:${s.toString().padStart(2,0)}`;
+}
+function showTime(){timeEl.innerText=fmt(focusTime);}
+function showPause(){tipEl.innerText=pauseTime>0?`暂停剩余 ${Math.floor(pauseTime/60)}:${(pauseTime%60).toString().padStart(2,0)}`:"";}
+
+function render(){
+  boxEl.innerHTML="";
+  let list=books[current];
+  for(let i=0;i<itemCount;i++){
+    let div=document.createElement("div");
+    div.className="item";
+    div.innerText=unlocked.includes(current*100+i)?list[i]:"?";
+    boxEl.appendChild(div);
+  }
+}
+document.querySelectorAll(".tab").forEach(tab=>{
+  tab.onclick=()=>{
+    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+    tab.classList.add("active");
+    current=+tab.dataset.id;
+    render();
+  }
+});
+
+function getReward(){
+  let all=[],ok=[];
+  books.forEach((b,i)=>{for(let j=0;j<itemCount;j++)all.push(i*100+j)});
+  ok=all.filter(x=>!unlocked.includes(x));
+  if(!ok.length)return alert("🎉全部收集完毕！");
+  let r=ok[Math.floor(Math.random()*ok.length)];
+  unlocked.push(r);
+  localStorage.setItem("unlocked",JSON.stringify(unlocked));
+  render();
+}
+
+$("start").onclick=()=>{
+  if(t1)return;
+  $("start").disabled=true; $("pause").disabled=false;
+  t1=setInterval(()=>{
+    focusTime--;
+    showTime();
+    if(focusTime<=0){
+      clearInterval(t1);t1=null;
+      getReward();
+      $("start").disabled=false; $("pause").disabled=true;
+    }
+  },1000);
+};
+$("pause").onclick=()=>{
+  if(isPause||!t1)return;
+  isPause=true;
+  clearInterval(t1);t1=null;
+  $("pause").disabled=true;
+  t2=setInterval(()=>{
+    pauseTime--;
+    showPause();
+    if(pauseTime<=0){
+      clearInterval(t2);t2=null;
+      isPause=false;
+      $("pause").disabled=false;
+      $("start").click();
+    }
+  },1000);
+};
+$("reset").onclick=()=>{
+  clearInterval(t1);clearInterval(t2);
+  t1=t2=null; isPause=false;
+  focusTime=3600; pauseTime=900;
+  showTime(); showPause();
+  $("start").disabled=false; $("pause").disabled=true;
+};
+
+showTime(); render();
+</script>
+</body>
+</html>
